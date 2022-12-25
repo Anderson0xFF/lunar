@@ -55,7 +55,7 @@ impl Lunar {
         }
     }
 
-    pub fn create_static_function(&self, name: &str, function: fn(LunarContext) -> i32) {
+    pub fn create_static_function(&self, name: &str, function: fn(ctx: LunarContext) -> i32) {
         unsafe {
             let ptr = function as *const ();
             let code: extern "C" fn(L: lua_State) = std::mem::transmute(ptr);
