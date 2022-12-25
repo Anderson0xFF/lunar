@@ -1,7 +1,7 @@
 extern crate libc;
 
 mod lua;
-pub mod lunar;
+pub mod vm;
 pub mod state;
 pub mod value;
 pub mod typedef;

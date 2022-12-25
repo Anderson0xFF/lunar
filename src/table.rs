@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::{lua::*, lunar::Lunar, lunar_ref::LunarRef, value::LunarValue, context::LunarContext};
+use crate::{lua::*, vm::Lunar, lunar_ref::LunarRef, value::LunarValue, context::LunarContext};
 
 #[derive(Debug, Clone)]
 pub struct Table {

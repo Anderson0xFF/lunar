@@ -5,7 +5,7 @@ use std::{
 
 use crate::{
     lua::*,
-    lunar::Lunar,
+    vm::Lunar,
     state::LunarState,
     typedef::{LunarError, LunarType, Type},
     value::LunarValue,
