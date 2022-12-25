@@ -74,6 +74,11 @@ The main reason for this is that LUA, being a dynamically typed language, it may
 
 Since we know exactly that the value passed was of type int, we forcefully unwrap the value. But attention, in a real scenario you should implement a safe way to solve this, and not forcing the unwrap using ``unwrap()``.
 
+Finally we call the context function and put the result inside it.
+The result is stored inside a LunarValue to ensure the safety of the returned value.
+
+You must use a LuaValue based on the return type. There is LunarValue of several LUA types.
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE)
