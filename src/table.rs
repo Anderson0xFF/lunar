@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::{lua::*, vm::Lunar, lunar_ref::LunarRef, value::LunarValue, context::LunarContext};
+use crate::{lua::*, vm::Lunar, lunar_ref::LunarRef, value::LunarValue, context::LunarContext, stack::LuaStack};
 
 #[derive(Debug, Clone)]
 pub struct Table {
@@ -10,7 +10,7 @@ pub struct Table {
 
 impl Table {
 
-    pub fn new(ctx: Rc<LunarContext>, name: &str, global: bool) -> Table{
+    pub(crate) fn new(ctx: Rc<LunarContext>, name: &str, global: bool) -> Table{
         unsafe {
             lua_createtable(ctx.ptr(), 0, 0);
             let table = lua_gettop(ctx.ptr());
@@ -31,16 +31,12 @@ impl Table {
     pub fn set(&self, field: &str, value: LunarValue) {
         self.lunar_ref.get();
         self.ctx.push(value);
-        self.ctx.set_field(field, 1);
+        self.ctx.set_field(field, LuaStack::STACK1.into());
     }
 
     #[inline]
-    pub fn push_table(&self){
+    pub(crate) fn push_table(&self){
         self.lunar_ref.get();
     }
 
-}
-
-pub struct MetaTable {
-    lunar_ref: LunarRef,
 }
