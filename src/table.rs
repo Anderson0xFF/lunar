@@ -3,8 +3,9 @@ use std::rc::Rc;
 use crate::{
     context::{LunarContext, Value},
     lua::*,
+    metatable::MetaTable,
     refr::LuaRef,
-    types::Type, metatable::MetaTable,
+    types::Type,
 };
 
 #[derive(Debug, Clone)]
@@ -50,7 +51,13 @@ impl Table {
         self.ctx.pop_last();
     }
 
-    
+    pub fn push_function(&self, field: &str, function: *const ()) {
+        let stack = self.luaref.push_reference();
+        self.ctx.set_field(field, stack);
+        push_function(self.ctx.L(), function);
+        self.ctx.pop_last();
+    }
+
     pub fn set_metatable(&self, metatable: &MetaTable) {
         self.ctx.set_metatable(self, metatable);
     }
@@ -70,7 +77,6 @@ impl Table {
         self.ctx.get_int::<T>(field)
     }
 
-
     pub fn get_float<T>(&self, field: &str) -> Result<T, LunarError>
     where
         T: Type + From<f64>,
@@ -86,7 +92,6 @@ impl Table {
         self.ctx.get_uint(field)
     }
 
-
     pub fn get_long(&self, field: &str) -> Result<i64, LunarError> {
         let stack = self.luaref.push_reference();
         let field = self.ctx.get_field(field, stack);
@@ -94,7 +99,7 @@ impl Table {
     }
 
     #[inline]
-    pub(crate) fn push_table(&self) -> i32{
+    pub(crate) fn push_table(&self) -> i32 {
         self.luaref.push_reference()
     }
 
