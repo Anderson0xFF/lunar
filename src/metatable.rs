@@ -5,7 +5,6 @@ use crate::{
     table::Table,
 };
 
-
 pub struct MetaTable {
     table: Table,
 }
