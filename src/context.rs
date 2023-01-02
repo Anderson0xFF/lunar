@@ -2,6 +2,8 @@
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
 
+use std::mem::size_of;
+
 use libc::c_void;
 
 use crate::{
@@ -14,16 +16,30 @@ use crate::{
 pub type Function = fn(LunarContext) -> i32;
 const STACK_MAX: i32 = 8;
 
+pub struct Userdata<T> {
+    ptr: *mut T,
+    size: usize,
+}
 
-pub trait Userdata {
-    fn as_ptr(&self) -> *mut c_void {
-        Box::into_raw(Box::new(self)) as *mut c_void
+impl<T> Userdata<T> {
+    pub fn new(value: T) -> Userdata<T> {
+        let data = Box::new(value);
+        Userdata {
+            ptr: Box::into_raw(data),
+            size: size_of::<T>(),
+        }
+    }
+
+    pub fn as_ptr(&self) -> *mut c_void {
+        self.ptr as *mut c_void
+    }
+
+    pub fn size(&self) -> usize {
+        self.size
     }
 }
 
-
-
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Value {
     Nil,
     Bool(bool),
@@ -113,6 +129,14 @@ impl LunarContext {
         }
     }
 
+    pub fn get_userdata<T>(&self, arg: i32) -> Box<T> {
+        unsafe {
+            let ptr = lua_getuserdata(self.0, arg) as *mut T;
+            let value: Box<T> = Box::from_raw(ptr);
+            return value;
+        }
+    }
+
     pub fn get_float<T>(&self, arg: i32) -> Result<T, LunarError>
     where
         T: Type + From<f64>,
@@ -170,13 +194,15 @@ impl LunarContext {
         }
     }
 
-    pub(crate) fn stacktrace(&self) {
+    pub fn stacktrace(&self) {
         println!("\n--------------------------STACKTRACE--------------------------");
 
         for stack in 1..STACK_MAX {
             let typename = self.get_type(stack);
 
-            if (typename == LuaType::Table || typename == LuaType::Userdata) && self.is_string("__name", stack) {
+            if (typename == LuaType::Table || typename == LuaType::Userdata)
+                && self.is_string("__name", stack)
+            {
                 let field = self.get_field("__name", stack);
                 let name = self.get_string(field).unwrap();
                 println!(
