@@ -40,11 +40,7 @@ extern "C" {
     pub fn lua_setglobal(L: lua_State, key: const_char);
     pub fn lua_setfield(L: lua_State, stack: i32, key: const_char);
 
-    //pub fn luaL_checkint(L: lua_State, stack: i32) -> i32;
     pub fn luaL_checkinteger(L: lua_State, stack: i32) -> i64;
-    //pub fn luaL_checklong(L: lua_State, stack: i32) -> i64;
-    //pub fn luaL_checkunsigned(L: lua_State, stack: i32) -> u32;
-
     pub fn lua_toboolean(L: lua_State, stack: i32) -> bool;
     pub fn luaL_checknumber(L: lua_State, stack: i32) -> f64;
     pub fn luaL_checklstring(L: lua_State, stack: i32, len: *mut size_t) -> const_char;
