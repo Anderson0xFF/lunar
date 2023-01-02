@@ -10,6 +10,7 @@ use crate::{
     table::Table,
 };
 
+
 #[derive(Debug, Clone)]
 pub struct Lunar {
     lua: State,
@@ -38,6 +39,13 @@ impl Lunar {
         }
     }
 
+        #[inline]
+    pub fn load(&self, script: &str) {
+        unsafe {
+            luaL_loadstring(self.lua.L(), to_const_char(script.to_string()));
+        }
+    }
+
     pub fn create_static_function(&self, name: &str, function: fn(ctx: LunarContext) -> i32) {
         unsafe {
             let function = function as *const ();
@@ -51,10 +59,10 @@ impl Lunar {
         table(Table::new(ctx, name, global))
     }
 
-    pub fn create_userdata(&self, name: &str, data: fn(&MetaTable)) {
+    pub fn register_userdata(&self, name: &str, data: fn(&MetaTable)) {
         let ctx = Rc::new(LunarContext::new(self.lua.L()));
         let class = Table::new(ctx.clone(), name, true);
-        let methods = MetaTable::new(ctx.clone(), "method");
+        let methods = MetaTable::new(ctx.clone(), name);
         data(&methods);
 
         methods.add_meta_method(MetaMethod::NewIndex, Value::Function(|_|{
