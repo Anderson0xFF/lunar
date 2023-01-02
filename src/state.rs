@@ -2,16 +2,16 @@
 use crate::lua::*;
 
 #[derive(Debug, Clone)]
-pub struct LunarState(lua_State);
+pub struct State(lua_State);
 
-impl LunarState {
-    pub(crate) fn new() -> LunarState {
+impl State {
+    pub(crate) fn new() -> State {
         unsafe {
             let ptr = luaL_newstate();
             if ptr.is_null() {
-                panic!("[Lunar]: Unable to create a lua state.")
+                panic!("[LUA]: Unable to create a lua state.")
             }
-            return LunarState(ptr);
+            return State(ptr);
         }
     }
 
@@ -23,12 +23,12 @@ impl LunarState {
     }
 
     #[inline]
-    pub(crate) fn get(&self) -> lua_State {
+    pub(crate) fn L(&self) -> lua_State {
         self.0
     }
 }
 
-impl Drop for LunarState {
+impl Drop for State {
     #[inline]
     fn drop(&mut self) {
         if !self.0.is_null() { self.destroy(); }
