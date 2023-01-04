@@ -24,10 +24,9 @@ pub struct Userdata<T> {
 impl<T> Userdata<T> {
     pub fn new(value: T) -> Userdata<T> {
         let data = Box::new(value);
-        Userdata {
-            ptr: Box::into_raw(data),
-            size: size_of::<T>(),
-        }
+        let ptr = Box::into_raw(data);
+        let size = size_of::<T>();
+        Userdata { ptr, size }
     }
 
     pub fn as_ptr(&self) -> *mut c_void {
