@@ -6,7 +6,7 @@ mod tests {
     };
 
     #[test]
-    fn lunar_state_is_valided() {
+    fn lunar_state_is_valid() {
         //let lunar = Lunar::new();
         //assert!(!lunar.get().is_null());
     }
@@ -33,7 +33,7 @@ mod tests {
     }
 
     #[test]
-    fn static_function_get_args_interger() {
+    fn static_function_get_args_integer() {
         let lunar = Lunar::new();
         lunar.load_std_library();
 
@@ -56,7 +56,7 @@ mod tests {
         lunar.create_static_function("test", |ctx| {
             assert_eq!(ctx.get_string(1), Ok("Hello World!".to_string()));
 
-            return ctx.returns(Value::Nil);
+            ctx.returns(Value::Nil)
         });
 
         lunar.load("test('Hello World!')");
@@ -115,14 +115,14 @@ mod tests {
 
     #[test]
     fn create_userdata() {
-        struct Calculator();
+        struct Calculator(i32, i32);
 
         let lunar = Lunar::new();
         lunar.load_std_library();
 
         lunar.register_userdata("Calculator", |methods| {
             methods.constructor(|ctx| -> i32 {
-                let calc = Userdata::new(Calculator());
+                let calc = Userdata::new(Calculator(35, 25));
                 ctx.returns(Value::Userdata("Calculator", calc.as_ptr(), calc.size()))
             });
         });
@@ -189,7 +189,8 @@ mod tests {
         lunar.load(
             "
             local calc = Calculator(10, 10)
-            assert(calc:sun() == 20)
+            local value = calc:sun()
+            assert(value == 20)
             ",
         );
 
