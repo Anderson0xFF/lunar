@@ -33,6 +33,10 @@ impl<T> Userdata<T> {
         self.ptr as *mut c_void
     }
 
+    pub fn as_box(&self) -> Box<T>{
+        unsafe { Box::from_raw(self.ptr) }
+    }
+
     pub fn size(&self) -> usize {
         self.size
     }
@@ -193,14 +197,14 @@ impl LunarContext {
         }
     }
 
-    pub fn call_function(&self, arg: i32, args: Vec<Value>){
+    pub fn call_function(&self, arg: i32, args: Vec<Value>, nresult: i32){
         let nargs = args.len() as i32;
         unsafe{
             lua_pushvalue(self.L(), arg);
             for v in args {
                 self.push(v);
             }
-            pcall(self.L(), nargs, 0, 0).unwrap();
+            pcall(self.L(), nargs, nresult, 0).unwrap();
         }
     }
 
