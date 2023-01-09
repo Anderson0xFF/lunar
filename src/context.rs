@@ -193,6 +193,17 @@ impl LunarContext {
         }
     }
 
+    pub fn call_function(&self, arg: i32, args: Vec<Value>){
+        let nargs = args.len() as i32;
+        unsafe{
+            lua_pushvalue(self.L(), arg);
+            for v in args {
+                self.push(v);
+            }
+            pcall(self.L(), nargs, 0, 0).unwrap();
+        }
+    }
+
     pub fn stacktrace(&self) {
         println!("\n--------------------------STACKTRACE--------------------------");
 
