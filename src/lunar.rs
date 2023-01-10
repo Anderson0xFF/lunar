@@ -39,10 +39,18 @@ impl Lunar {
         }
     }
 
-        #[inline]
+    #[inline]
     pub fn load(&self, script: &str) {
         unsafe {
             luaL_loadstring(self.lua.L(), to_const_char(script.to_string()));
+        }
+    }
+
+    pub fn create_global_value(&self, name: &str, value: Value){
+        unsafe {
+            let ctx = LunarContext::new(self.lua.L());
+            ctx.push(value);
+            lua_setglobal(self.lua.L(), to_const_char(name.to_string()));
         }
     }
 

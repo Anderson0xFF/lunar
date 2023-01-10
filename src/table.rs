@@ -51,11 +51,8 @@ impl Table {
         self.ctx.pop_last();
     }
 
-    pub fn push_function(&self, field: &str, function: *const ()) {
-        let stack = self.luaref.push_reference();
-        self.ctx.set_field(field, stack);
-        push_function(self.ctx.L(), function);
-        self.ctx.pop_last();
+    pub fn set_function(&self, name: &str, function: fn(ctx: LunarContext) -> i32) {
+        self.set(name, Value::Function(function));
     }
 
     pub fn set_metatable(&self, metatable: &MetaTable) {
