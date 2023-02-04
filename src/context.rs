@@ -140,9 +140,11 @@ impl LunarContext {
     }
 
     
-    pub fn get_light_userdata<T>(&self, arg: i32) -> *const T {
-        let ptr = lua_get_lightuserdata(self.0, arg) as *const T;
-        return ptr;
+    pub fn get_light_userdata<T>(&self, arg: i32) -> Option<&mut T> {
+        let ptr = lua_get_lightuserdata(self.0, arg) as *mut T;
+        unsafe {
+            return ptr.as_mut();
+        }
     }
 
     pub fn get_float<T>(&self, arg: i32) -> Result<T, LunarError>
