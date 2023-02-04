@@ -3,7 +3,6 @@
 #![allow(non_camel_case_types)]
 
 use std::mem::size_of;
-
 use libc::c_void;
 
 use crate::{
@@ -197,10 +196,10 @@ impl LunarContext {
         }
     }
 
-    pub fn call_function(&self, arg: i32, args: Vec<Value>, nresult: i32){
+    pub fn call_function(&self, stack: i32, args: Vec<Value>, nresult: i32){
         let nargs = args.len() as i32;
         unsafe{
-            lua_pushvalue(self.L(), arg);
+            lua_pushvalue(self.L(), stack);
             for v in args {
                 self.push(v);
             }

@@ -14,6 +14,7 @@ pub type lua_Integer = i64;
 pub type lua_Unsigned = u64;
 pub type lua_Number = f64;
 pub type LunarError = &'static str;
+pub type lua_Writer = extern "C" fn(L: lua_State, void: void_ptr, __size: usize, ud: void_ptr);
 
 pub const LUAI_MAXSTACK: i32 = 1000000;
 pub const LUA_REGISTRYINDEX: i32 = -LUAI_MAXSTACK - 1000;
@@ -65,6 +66,8 @@ extern "C" {
     pub fn lua_createtable(L: lua_State, narr: i32, nrec: i32);
     pub fn lua_settop(L: lua_State, stack: i32);
     pub fn lua_setmetatable(L: lua_State, stack: i32) -> i32;
+    pub fn lua_dump(L: lua_State, writer: lua_Writer, data: void_ptr, strip: i32) -> i32;
+
 }
 
 pub(crate) fn luaL_checkint(L: lua_State, stack: i32) -> i32 {
@@ -84,9 +87,9 @@ fn lua_newuserdata(L: lua_State, size: usize) -> *mut c_void {
 }
 
 pub(crate) fn lua_pushuserdata(L: lua_State, ptr: *mut c_void, size: usize) {
-    unsafe{
-        let c_ptr = lua_newuserdata(L, size) as *mut *mut c_void ;
-        *c_ptr = ptr;     
+    unsafe {
+        let c_ptr = lua_newuserdata(L, size) as *mut *mut c_void;
+        *c_ptr = ptr;
     }
 }
 

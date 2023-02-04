@@ -67,6 +67,13 @@ impl Lunar {
         table(Table::new(ctx, name, global))
     }
 
+    pub fn call_global_function(&self, name: &str, args: Vec<Value>, nresult: i32){
+        let ctx = Rc::new(LunarContext::new(self.lua.L()));
+        ctx.get_global(name);
+        let function_stack = ctx.get_last();
+        ctx.call_function(function_stack, args, nresult);
+    }
+
     pub fn register_userdata(&self, name: &str, data: fn(&MetaTable)) {
         let ctx = Rc::new(LunarContext::new(self.lua.L()));
         let class = Table::new(ctx.clone(), name, true);
