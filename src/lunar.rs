@@ -89,5 +89,7 @@ impl Lunar {
         methods.push_metatable();
         ctx.set_field("__index", 1);
         class.set_metatable(&methods);
+
+        ctx.pop_last();
     }
 }
