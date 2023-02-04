@@ -52,7 +52,7 @@ pub enum Value {
     Float(f64),
     String(String),
     Userdata(&'static str, *mut c_void, usize),
-    LightUserdata(*mut c_void),
+    LightUserdata(&'static str, *mut c_void),
     Table(Table),
 }
 
@@ -78,8 +78,8 @@ impl LunarContext {
                 Value::Long(i) => lua_pushinteger(self.0, i.into()),
                 Value::Float(f) => lua_pushnumber(self.0, f),
                 Value::String(s) => lua_pushstring(self.0, to_const_char(s)),
-                Value::Userdata(name, data, size) => self.push_userdata(name, data, size),
-                Value::LightUserdata(ptr) => lua_pushlightuserdata(self.0, ptr),
+                Value::Userdata(name, ptr, size) => self.push_userdata(name, ptr, size),
+                Value::LightUserdata(name, ptr) => self.push_light_userdata(name, ptr),
                 Value::Table(table) => {
                     table.push_table();
                 }
@@ -260,6 +260,19 @@ impl LunarContext {
             if !name.is_empty() {
                 lua_getglobal(self.0, to_const_char(name.to_string()));
                 lua_setmetatable(self.0, userdata);
+            }
+        }
+    }
+
+    
+    fn push_light_userdata(&self, name: &str, ptr: *mut c_void) {
+        unsafe {
+            lua_pushlightuserdata(self.0, ptr);
+            let lightuserdata = lua_gettop(self.0);
+
+            if !name.is_empty() {
+                lua_getglobal(self.0, to_const_char(name.to_string()));
+                lua_setmetatable(self.0, lightuserdata);
             }
         }
     }
