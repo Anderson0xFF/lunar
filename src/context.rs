@@ -139,6 +139,12 @@ impl LunarContext {
         }
     }
 
+    
+    pub fn get_light_userdata<T>(&self, arg: i32) -> *const T {
+        let ptr = lua_get_lightuserdata(self.0, arg) as *const T;
+        return ptr;
+    }
+
     pub fn get_float<T>(&self, arg: i32) -> Result<T, LunarError>
     where
         T: Type + From<f64>,

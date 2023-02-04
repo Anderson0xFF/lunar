@@ -51,7 +51,7 @@ extern "C" {
     pub fn lua_getglobal(L: lua_State, name: const_char) -> i32;
     pub fn lua_getfield(L: lua_State, stack: i32, key: const_char) -> i32;
 
-    pub fn lua_touserdata(L: lua_State, idx: i32) -> *mut *mut std::ffi::c_void;
+    pub fn lua_touserdata(L: lua_State, idx: i32) -> *mut std::ffi::c_void;
     pub fn luaL_ref(L: lua_State, t: i32) -> i32;
     pub fn lua_pushnil(L: lua_State);
     pub fn lua_pushnumber(L: lua_State, number: lua_Number);
@@ -95,8 +95,16 @@ pub(crate) fn lua_pushuserdata(L: lua_State, ptr: *mut c_void, size: usize) {
 
 pub(crate) fn lua_getuserdata(L: lua_State, idx: i32) -> *mut c_void {
     unsafe {
-        let ptr = lua_touserdata(L, idx);
+        let ptr =   lua_touserdata(L, idx) as  *mut *mut c_void;
         *ptr
+    }
+}
+
+
+pub(crate) fn lua_get_lightuserdata(L: lua_State, idx: i32) -> *mut c_void {
+    unsafe {
+        let ptr = lua_touserdata(L, idx);
+        return ptr;
     }
 }
 
