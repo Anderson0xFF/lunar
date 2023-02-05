@@ -95,7 +95,7 @@ pub(crate) fn lua_pushuserdata(L: lua_State, ptr: *mut c_void, size: usize) {
 
 pub(crate) fn lua_getuserdata(L: lua_State, idx: i32) -> *mut c_void {
     unsafe {
-        let ptr =   lua_touserdata(L, idx) as  *mut *mut c_void;
+        let ptr = lua_touserdata(L, idx) as  *mut *mut c_void;
         *ptr
     }
 }

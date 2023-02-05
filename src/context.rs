@@ -191,7 +191,7 @@ impl LunarContext {
     }
 
     #[inline]
-    pub(crate) fn get_type(&self, arg: i32) -> LuaType {
+    pub fn get_type(&self, arg: i32) -> LuaType {
         unsafe {
             return lua_type(self.0, arg).into();
         }
