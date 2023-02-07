@@ -198,7 +198,7 @@ impl LunarContext {
     }
 
     #[inline]
-    pub(crate) fn get_last(&self) -> i32 {
+    pub fn stack_size(&self) -> i32 {
         unsafe {
             return lua_gettop(self.0);
         }
@@ -255,7 +255,7 @@ impl LunarContext {
 
     fn is_string(&self, field: &str, stack: i32) -> bool {
         self.get_field(field, stack);
-        let isstr = self.get_type(self.get_last()) == LuaType::String;
+        let isstr = self.get_type(self.stack_size()) == LuaType::String;
         self.pop_last();
         return isstr;
     }

@@ -70,7 +70,7 @@ impl Lunar {
     pub fn call_global_function(&self, name: &str, args: Vec<Value>, nresult: i32){
         let ctx = Rc::new(LunarContext::new(self.lua.L()));
         ctx.get_global(name);
-        let function_stack = ctx.get_last();
+        let function_stack = ctx.stack_size();
         ctx.call_function(function_stack, args, nresult);
     }
 
