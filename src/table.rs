@@ -59,13 +59,13 @@ impl Table {
         self.ctx.set_metatable(self, metatable);
     }
 
-    pub fn get_boolean(&self, field: &str) -> Result<bool, LunarError> {
+    pub fn get_boolean(&self, field: &str) -> bool {
         let stack = self.luaref.push_reference();
         let field = self.ctx.get_field(field, stack);
         self.ctx.get_boolean(field)
     }
 
-    pub fn get_int<T>(&self, field: &str) -> Result<T, LunarError>
+    pub fn get_int<T>(&self, field: &str) -> T
     where
         T: Type + From<i8> + From<i16> + From<i32>,
     {
@@ -74,7 +74,7 @@ impl Table {
         self.ctx.get_int::<T>(field)
     }
 
-    pub fn get_float<T>(&self, field: &str) -> Result<T, LunarError>
+    pub fn get_float<T>(&self, field: &str) -> T
     where
         T: Type + From<f64>,
     {
@@ -83,13 +83,13 @@ impl Table {
         self.ctx.get_float::<T>(field)
     }
 
-    pub fn get_uint(&self, field: &str) -> Result<u32, LunarError> {
+    pub fn get_uint(&self, field: &str) -> u32 {
         let stack = self.luaref.push_reference();
         let field = self.ctx.get_field(field, stack);
         self.ctx.get_uint(field)
     }
 
-    pub fn get_long(&self, field: &str) -> Result<i64, LunarError> {
+    pub fn get_long(&self, field: &str) -> i64 {
         let stack = self.luaref.push_reference();
         let field = self.ctx.get_field(field, stack);
         self.ctx.get_long(field)

@@ -38,8 +38,8 @@ mod tests {
         lunar.load_std_library();
 
         lunar.create_static_function("test", |ctx| {
-            assert_eq!(ctx.get_int::<i32>(1), Ok(75));
-            assert_eq!(ctx.get_int::<i32>(2), Ok(1166));
+            assert_eq!(ctx.get_int::<i32>(1), 75);
+            assert_eq!(ctx.get_int::<i32>(2), 1166);
 
             return ctx.returns(Value::Nil);
         });
@@ -146,8 +146,8 @@ mod tests {
 
         lunar.register_userdata("Calculator", |methods| {
             methods.constructor(|ctx| {
-                let x = ctx.get_int::<i32>(2).unwrap();
-                let y = ctx.get_int::<i32>(3).unwrap();
+                let x = ctx.get_int::<i32>(2);
+                let y = ctx.get_int::<i32>(3);
                 let calc = Userdata::new(Calculator(x, y));
                 ctx.returns(Value::Userdata("Calculator", calc.as_ptr(), calc.size()))
             });
@@ -173,8 +173,8 @@ mod tests {
 
         lunar.register_userdata("Calculator", |methods| {
             methods.constructor(|ctx| {
-                let x = ctx.get_int::<i32>(2).unwrap();
-                let y = ctx.get_int::<i32>(3).unwrap();
+                let x = ctx.get_int::<i32>(2);
+                let y = ctx.get_int::<i32>(3);
                 let calc = Userdata::new(Calculator(x, y));
 
                 ctx.returns(Value::Userdata("Calculator", calc.as_ptr(), calc.size()))
