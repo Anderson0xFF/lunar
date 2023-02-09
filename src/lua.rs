@@ -67,7 +67,7 @@ extern "C" {
     pub fn lua_settop(L: lua_State, stack: i32);
     pub fn lua_setmetatable(L: lua_State, stack: i32) -> i32;
     pub fn lua_dump(L: lua_State, writer: lua_Writer, data: void_ptr, strip: i32) -> i32;
-    pub fn luaL_typeerror(L: lua_State, arg: i32, tname: const_char) -> !;
+    pub fn luaL_typeerror(L: lua_State, arg: i32, tname: const_char);
     pub fn luaL_argerror(L: lua_State, arg: i32, extramsg: const_char) -> i32;
     pub fn luaL_checkudata (L: lua_State, arg: i32, tname: const_char) -> void_ptr;
 }

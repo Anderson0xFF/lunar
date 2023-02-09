@@ -45,7 +45,7 @@ mod tests {
         });
 
         lunar.load("test(75, 1166)");
-        lunar.exec().unwrap();
+        assert!(lunar.exec().is_ok())
     }
 
     #[test]
