@@ -115,14 +115,6 @@ pub(crate) fn lua_check_udata(L: lua_State, idx: i32, tname: &str) -> *mut c_voi
     }
 }
 
-pub(crate) fn lua_check_light_udata(L: lua_State, idx: i32, tname: &str) -> *mut c_void {
-    unsafe {
-        let tname = to_const_char(tname.to_string());
-        let ptr = luaL_checkudata(L, idx, tname);
-        return ptr;
-    }
-}
-
 pub(crate) fn pcall(L: lua_State, nargs: i32, nresults: i32, errfunc: i32) -> Result<(), String> {
     unsafe {
         if lua_pcallk(L, nargs, nresults, errfunc, 0, 0) > 0 {

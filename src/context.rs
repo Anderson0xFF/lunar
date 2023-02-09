@@ -159,13 +159,6 @@ impl LunarContext {
         }
     }
 
-    pub fn check_light_userdata<T>(&self, arg: i32, tname: &str) -> Option<&mut T> {
-        let ptr = lua_check_light_udata(self.0, arg, tname) as *mut T;
-        unsafe {
-            return ptr.as_mut();
-        }
-    }
-
     pub fn get_string(&self, arg: i32) -> Result<String, LunarError> {
         unsafe {
             luaL_argexpected(self.0, self.get_type(arg) == LuaType::String, arg, "string");
