@@ -144,6 +144,13 @@ impl LunarContext {
         }
     }
 
+    pub fn get_light_userdata<T>(&self, arg: i32) -> Option<&mut T> {
+        let ptr = lua_get_lightuserdata(self.0, arg) as *mut T;
+        unsafe {
+            return ptr.as_mut();
+        }
+    }
+
     pub fn check_userdata<T>(&self, arg: i32, tname: &str) -> Box<T> {
         unsafe {
             let ptr = lua_check_udata(self.0, arg, tname) as *mut T;
