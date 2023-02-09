@@ -75,6 +75,7 @@ extern "C" {
 pub(crate) fn luaL_argexpected(L: lua_State, cond: bool, stack: i32, tname: &str) {
     unsafe {
         if !cond {
+            let tname = String::from(tname);
             let tname = CString::new(tname).unwrap().into_raw();
             luaL_typeerror(L, stack, tname);
         }
