@@ -67,7 +67,7 @@ extern "C" {
     pub fn lua_settop(L: lua_State, stack: i32);
     pub fn lua_setmetatable(L: lua_State, stack: i32) -> i32;
     pub fn lua_dump(L: lua_State, writer: lua_Writer, data: void_ptr, strip: i32) -> i32;
-    pub fn luaL_typeerror(L: lua_State, arg: i32, tname: const_char) -> i32;
+    pub fn luaL_typeerror(L: lua_State, arg: i32, tname: *const c_char) -> i32;
     pub fn luaL_argerror(L: lua_State, arg: i32, extramsg: const_char) -> i32;
     pub fn luaL_checkudata (L: lua_State, arg: i32, tname: const_char) -> void_ptr;
 }
@@ -75,8 +75,7 @@ extern "C" {
 pub(crate) fn luaL_argexpected(L: lua_State, cond: bool, stack: i32, tname: &str) {
     unsafe {
         if !cond {
-            let tname = String::from(tname);
-            let tname = CString::new(tname).unwrap().into_raw();
+            let tname = CString::new(tname).unwrap().into_raw() as *const c_char;
             luaL_typeerror(L, stack, tname);
         }
     }
