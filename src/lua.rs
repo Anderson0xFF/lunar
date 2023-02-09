@@ -67,23 +67,94 @@ extern "C" {
     pub fn lua_settop(L: lua_State, stack: i32);
     pub fn lua_setmetatable(L: lua_State, stack: i32) -> i32;
     pub fn lua_dump(L: lua_State, writer: lua_Writer, data: void_ptr, strip: i32) -> i32;
-
+    pub fn luaL_typeerror(L: lua_State, arg: i32, tname: const_char) -> !;
+    pub fn luaL_argerror(L: lua_State, arg: i32, extramsg: const_char) -> i32;
+    pub fn luaL_checkudata (L: lua_State, arg: i32, tname: const_char) -> void_ptr;
 }
 
+pub(crate) fn luaL_argexpected(L: lua_State, cond: bool, stack: i32, tname: &str) {
+    unsafe {
+        if !cond {
+            let tname = to_const_char(tname.to_string());
+            luaL_typeerror(L, stack, tname)
+        }
+    }
+}
+
+#[inline]
+pub(crate) fn lua_argerror(L: lua_State, arg: i32, extramsg: &str) -> i32 {
+    let extramsg = to_const_char(extramsg.to_string());
+    unsafe { luaL_argerror(L, arg, extramsg) }
+}
+
+#[inline]
 pub(crate) fn luaL_checkint(L: lua_State, stack: i32) -> i32 {
     unsafe { luaL_checkinteger(L, stack).try_into().unwrap() }
 }
 
+#[inline]
 pub(crate) fn luaL_checkunsigned(L: lua_State, stack: i32) -> u32 {
     unsafe { luaL_checkinteger(L, stack).try_into().unwrap() }
 }
 
+#[inline]
 pub(crate) fn lua_pop(L: lua_State, stack: i32) {
     unsafe { lua_settop(L, -(stack) - 1) }
 }
 
+#[inline]
 fn lua_newuserdata(L: lua_State, size: usize) -> *mut c_void {
     unsafe { lua_newuserdatauv(L, size, 1) }
+}
+
+
+pub(crate) fn lua_check_udata(L: lua_State, idx: i32, tname: &str) -> *mut c_void {
+    unsafe {
+        let tname = to_const_char(tname.to_string());
+        *(luaL_checkudata(L, idx, tname) as *mut *mut c_void)
+    }
+}
+
+pub(crate) fn lua_check_light_udata(L: lua_State, idx: i32, tname: &str) -> *mut c_void {
+    unsafe {
+        let tname = to_const_char(tname.to_string());
+        let ptr = luaL_checkudata(L, idx, tname);
+        return ptr;
+    }
+}
+
+pub(crate) fn pcall(L: lua_State, nargs: i32, nresults: i32, errfunc: i32) -> Result<(), String> {
+    unsafe {
+        if lua_pcallk(L, nargs, nresults, errfunc, 0, 0) > 0 {
+            return Err(error(L));
+        }
+    }
+    return Ok(());
+}
+
+pub(crate) fn error(L: lua_State) -> String {
+    let str = unsafe { lua_tolstring(L, 1, std::ptr::null_mut()) };
+    match to_string(str) {
+        Ok(value) => value,
+        Err(e) => panic!("Unable to get error description.\n  {e}"),
+    }
+}
+
+pub(crate) fn to_const_char(string: String) -> const_char {
+    match CString::new(string) {
+        Ok(c_string) => c_string,
+        Err(_) => panic!("Unable to convert 'string' to 'const char*'."),
+    }
+    .into_raw()
+}
+
+pub(crate) fn to_string(c_str: *mut i8) -> Result<String, LunarError> {
+    unsafe {
+        match CStr::from_ptr(c_str).to_str() {
+            Ok(str) => Ok(String::from(str)),
+            Err(_) => Err("Unable to convert 'const char*' to 'string'."),
+        }
+    }
 }
 
 pub(crate) fn lua_pushuserdata(L: lua_State, ptr: *mut c_void, size: usize) {
@@ -93,56 +164,16 @@ pub(crate) fn lua_pushuserdata(L: lua_State, ptr: *mut c_void, size: usize) {
     }
 }
 
+#[inline]
 pub(crate) fn lua_getuserdata(L: lua_State, idx: i32) -> *mut c_void {
-    unsafe {
-        let ptr = lua_touserdata(L, idx) as  *mut *mut c_void;
-        *ptr
-    }
+    unsafe { *(lua_touserdata(L, idx) as *mut *mut c_void) }
 }
 
-
+#[inline]
 pub(crate) fn lua_get_lightuserdata(L: lua_State, idx: i32) -> *mut c_void {
-    unsafe {
-        let ptr = lua_touserdata(L, idx);
-        return ptr;
-    }
+    unsafe { lua_touserdata(L, idx) }
 }
 
-pub(crate) fn pcall(L: lua_State, nargs: i32, nresults: i32, errfunc: i32) -> Result<(), String> {
-    unsafe {
-        if lua_pcallk(L, nargs, nresults, errfunc, 0, 0) > 0 {
-            let err = error(L);
-            return Err(format!("[LUA]: {err}."));
-        }
-    }
-
-    return Ok(());
-}
-
-pub(crate) fn error(L: lua_State) -> String {
-    let str = unsafe { lua_tolstring(L, 1, std::ptr::null_mut()) };
-    match to_string(str) {
-        Ok(value) => value,
-        Err(e) => panic!("[LUA]: Unable to get error description.\n  {e}"),
-    }
-}
-
-pub(crate) fn to_const_char(string: String) -> const_char {
-    match CString::new(string) {
-        Ok(c_string) => c_string,
-        Err(_) => panic!("[LUA]: Unable to convert 'String' to 'const char*'."),
-    }
-    .into_raw()
-}
-
-pub(crate) fn to_string(c_str: *mut i8) -> Result<String, LunarError> {
-    unsafe {
-        match CStr::from_ptr(c_str).to_str() {
-            Ok(str) => Ok(String::from(str)),
-            Err(_) => Err("[LUA]: Unable to convert 'const char*' to 'String'."),
-        }
-    }
-}
 
 pub(crate) fn push_function(L: lua_State, function: *const ()) {
     unsafe {
